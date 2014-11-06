@@ -11,8 +11,6 @@ module Phase5
     # You haven't done routing yet; but assume route params will be
     # passed in as a hash to `Params.new` as below:
     def initialize(req, route_params = {})
-      # p "qs - #{req.query_string}"
-#       p "body - #{req.body}"
       parsed_query_string = (req.query_string ? parse_www_encoded_form(req.query_string) : {})
       parsed_body = (req.body ? parse_www_encoded_form(req.body) : {})
       @params = parsed_query_string.merge!(route_params).merge!(parsed_body)
@@ -35,23 +33,19 @@ module Phase5
     # should return
     # { "user" => { "address" => { "street" => "main", "zip" => "89436" } } }
     def parse_www_encoded_form(www_encoded_form)
-      params = Hash.new { |h, k| h[k] = {} }
+      params = {}
       params_arr = URI::decode_www_form(www_encoded_form)
       params_arr.each do |key, val|
+        current = params
         key_arr = parse_key(key)
-        key_arr.each do |key|
-          params.each do 
+        key_arr[0..-2].each do |key|
+          current[key] ||= {}
+          current = current[key]
         end
-        # key_hash = create_nested_hash(key_arr, val)
+        current[key_arr[-1]] = val
       end
       params
     end
-    
-    # def create_nested_hash(key_arr, val)
-#       hash = {}
-#       return val if key_arr.empty?
-#       hash[key_arr.shift] = create_nested_hash(key_arr, val)
-#     end
 
     # this should return an array
     # user[address][street] should return ['user', 'address', 'street']

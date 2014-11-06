@@ -38,6 +38,7 @@ describe "the symphony of things" do
       req.stub(:path) { "/statuses/1" }
       req.stub(:request_method) { :get }
       route.run(req, res)
+      
       res.body.should == "got #1"
     end
   end
